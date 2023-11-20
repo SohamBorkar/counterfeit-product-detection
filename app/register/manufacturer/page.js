@@ -7,27 +7,71 @@ export default function Register() {
   const [registrationNumber, setRegistrationNumber] = useState("");
   const [officeAddress, setOfficeAddress] = useState("");
   const [contactInformation, setContactInformation] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleRegister() {
-    const postData = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        registration_number: registrationNumber,
-        company_name: companyName,
-        office_address: officeAddress,
-        contact_information: contactInformation,
-      }),
-    };
-
-    const response = await fetch("/api/register/manufacturer", postData);
-    const data = await response.json();
-    alert(data.message);
+async function handleRegister() {
+  // Validation checks
+  if (
+    !companyName ||
+    !registrationNumber ||
+    !officeAddress ||
+    !contactInformation ||
+    !email ||
+    !username ||
+    !password
+  ) {
+    alert('Please fill in all fields');
+    return;
   }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email address');
+    return;
+  }
+
+  if (password.length < 8) {
+    alert('Password should be at least 8 characters long');
+    return;
+  }
+
+  if (isNaN(registrationNumber)) {
+    alert('Registration number must be a number');
+    return;
+  }
+
+  const postData = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      registration_number: registrationNumber,
+      company_name: companyName,
+      office_address: officeAddress,
+      contact_information: contactInformation,
+      email: email,
+      username: username,
+      password: password,
+    }),
+  };
+
+  const response = await fetch("/api/register/manufacturer", postData);
+  const data = await response.json();
+
+  // Clear the form
+  setCompanyName("");
+  setRegistrationNumber("");
+  setOfficeAddress("");
+  setContactInformation("");
+  setEmail("");
+  setUsername("");
+  setPassword("");
+
+  alert(data.message);
+}
 
   return (
     <div>
@@ -38,7 +82,7 @@ export default function Register() {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Register as Manufacturer
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form className="space-y-4 md:space-y-6" action="#" id ="register-form">
                 {/* Company Information */}
                 <div>
                   <label htmlFor="companyName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -96,7 +140,23 @@ export default function Register() {
                     value={contactInformation}
                     onChange={(e) => setContactInformation(e.target.value)}
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Your Contact Information"
+                    placeholder="+91"
+                    required=""
+                  />
+                </div>
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Your Email"
                     required=""
                   />
                 </div>
